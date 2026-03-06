@@ -1,6 +1,6 @@
 {
   "name": "@neuralbase-org/js",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Official JavaScript client for the NeuralBase memory and ingest API.",
   "type": "module",
   "main": "./dist/neuralbase.js",

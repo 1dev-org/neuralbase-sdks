@@ -7,7 +7,7 @@ from urllib.error import HTTPError
 from urllib.request import Request, urlopen
 
 __all__ = ["NeuralBaseClient", "NeuralBaseError"]
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 
 
 @dataclass

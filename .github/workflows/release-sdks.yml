@@ -12,6 +12,16 @@ on:
         required: false
         default: false
         type: boolean
+      publish_js:
+        description: Publish the JavaScript SDK
+        required: false
+        default: true
+        type: boolean
+      publish_python:
+        description: Publish the Python SDK
+        required: false
+        default: true
+        type: boolean
 
 jobs:
   validate:
@@ -98,6 +108,7 @@ PY
 
   publish_js:
     needs: [validate, tag]
+    if: ${{ inputs.publish_js }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -128,6 +139,7 @@ PY
 
   build_python:
     needs: [validate, tag]
+    if: ${{ inputs.publish_python }}
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -155,6 +167,7 @@ PY
 
   publish_python:
     needs: build_python
+    if: ${{ inputs.publish_python }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -176,6 +189,7 @@ PY
 
   release_js:
     needs: [validate, tag, publish_js]
+    if: ${{ inputs.publish_js }}
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -194,6 +208,7 @@ PY
 
   release_python:
     needs: [validate, tag, publish_python]
+    if: ${{ inputs.publish_python }}
     runs-on: ubuntu-latest
     permissions:
       contents: write
