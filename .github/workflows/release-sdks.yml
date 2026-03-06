@@ -49,16 +49,7 @@ jobs:
         run: |
           set -euo pipefail
           JS_VERSION="$(node -p "require('./sdks/javascript/package.json').version")"
-          PY_VERSION="$(python3 - <<'PY'
-import pathlib
-import re
-text = pathlib.Path('sdks/python/pyproject.toml').read_text(encoding='utf-8')
-match = re.search(r'^version = "([^"]+)"$', text, re.MULTILINE)
-if not match:
-    raise SystemExit('Failed to locate Python SDK version in pyproject.toml')
-print(match.group(1))
-PY
-)"
+          PY_VERSION="$(python3 -c "import pathlib,re; text=pathlib.Path('sdks/python/pyproject.toml').read_text(encoding='utf-8'); match=re.search(r'^version = \"([^\"]+)\"$', text, re.MULTILINE); print(match.group(1) if match else (_ for _ in ()).throw(SystemExit('Failed to locate Python SDK version in pyproject.toml')))")"
           if [ "$INPUT_VERSION" != "$JS_VERSION" ]; then
             echo "JavaScript SDK version $JS_VERSION does not match requested version $INPUT_VERSION"
             exit 1
