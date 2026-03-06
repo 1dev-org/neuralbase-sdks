@@ -104,6 +104,8 @@ jobs:
     permissions:
       contents: read
       id-token: write
+    env:
+      NODE_AUTH_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN }}
     defaults:
       run:
         working-directory: sdks/javascript
