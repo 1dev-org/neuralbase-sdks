@@ -164,7 +164,6 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      id-token: write
     environment:
       name: pypi
       url: https://pypi.org/p/neuralbase
@@ -179,6 +178,8 @@ jobs:
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           packages-dir: dist
+          user: __token__
+          password: ${{ secrets.PYPI_API_TOKEN }}
 
   release_js:
     needs: [validate, tag, publish_js]
