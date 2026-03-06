@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "neuralbase"
+version = "0.1.0"
+description = "Official Python client for the NeuralBase memory and ingest API."
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+authors = [
+  { name = "NeuralBase" }
+]
+keywords = ["neuralbase", "memory", "vector-search", "rag", "ai"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Operating System :: OS Independent",
+  "Topic :: Software Development :: Libraries :: Python Modules"
+]
+
+[project.urls]
+Homepage = "https://neuralbase.cloud"
+Documentation = "https://neuralbase.cloud/docs/sdk/python"
+Source = "https://github.com/1dev-org/neuralbase-sdks"
+Issues = "https://github.com/1dev-org/neuralbase-sdks/issues"
+
+[tool.setuptools]
+py-modules = ["neuralbase"]

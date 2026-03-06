@@ -1,0 +1,211 @@
+name: Release SDKs
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: SDK version to release, for example 0.1.0
+        required: true
+        type: string
+      prerelease:
+        description: Mark GitHub Releases as prerelease
+        required: false
+        default: false
+        type: boolean
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.value }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Validate SDK versions
+        id: version
+        env:
+          INPUT_VERSION: ${{ inputs.version }}
+        run: |
+          set -euo pipefail
+          JS_VERSION="$(node -p "require('./sdks/javascript/package.json').version")"
+          PY_VERSION="$(python3 - <<'PY'
+import pathlib
+import re
+text = pathlib.Path('sdks/python/pyproject.toml').read_text(encoding='utf-8')
+match = re.search(r'^version = "([^"]+)"$', text, re.MULTILINE)
+if not match:
+    raise SystemExit('Failed to locate Python SDK version in pyproject.toml')
+print(match.group(1))
+PY
+)"
+          if [ "$INPUT_VERSION" != "$JS_VERSION" ]; then
+            echo "JavaScript SDK version $JS_VERSION does not match requested version $INPUT_VERSION"
+            exit 1
+          fi
+          if [ "$INPUT_VERSION" != "$PY_VERSION" ]; then
+            echo "Python SDK version $PY_VERSION does not match requested version $INPUT_VERSION"
+            exit 1
+          fi
+          echo "value=$INPUT_VERSION" >> "$GITHUB_OUTPUT"
+
+  tag:
+    needs: validate
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    outputs:
+      js_tag: ${{ steps.tags.outputs.js_tag }}
+      python_tag: ${{ steps.tags.outputs.python_tag }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Create SDK tags
+        id: tags
+        env:
+          VERSION: ${{ needs.validate.outputs.version }}
+        run: |
+          set -euo pipefail
+          JS_TAG="js-sdk-v${VERSION}"
+          PY_TAG="python-sdk-v${VERSION}"
+          git fetch --tags --force
+          for TAG in "$JS_TAG" "$PY_TAG"; do
+            if git rev-parse "$TAG" >/dev/null 2>&1; then
+              echo "Tag $TAG already exists"
+              exit 1
+            fi
+          done
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag -a "$JS_TAG" -m "Release JavaScript SDK ${VERSION}"
+          git tag -a "$PY_TAG" -m "Release Python SDK ${VERSION}"
+          git push origin "$JS_TAG" "$PY_TAG"
+          echo "js_tag=$JS_TAG" >> "$GITHUB_OUTPUT"
+          echo "python_tag=$PY_TAG" >> "$GITHUB_OUTPUT"
+
+  publish_js:
+    needs: [validate, tag]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    defaults:
+      run:
+        working-directory: sdks/javascript
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: https://registry.npmjs.org
+          cache: npm
+          cache-dependency-path: sdks/javascript/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build package
+        run: npm run build
+
+      - name: Publish to npm
+        run: npm publish --provenance --access public
+
+  build_python:
+    needs: [validate, tag]
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: sdks/python
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install build toolchain
+        run: python -m pip install --upgrade build
+
+      - name: Build package
+        run: python -m build
+
+      - name: Upload Python artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-sdk-dist
+          path: sdks/python/dist/
+
+  publish_python:
+    needs: build_python
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    environment:
+      name: pypi
+      url: https://pypi.org/p/neuralbase
+    steps:
+      - name: Download Python artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: python-sdk-dist
+          path: dist
+
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: dist
+
+  release_js:
+    needs: [validate, tag, publish_js]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Create JavaScript GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ needs.tag.outputs.js_tag }}
+          name: JavaScript SDK v${{ needs.validate.outputs.version }}
+          generate_release_notes: true
+          prerelease: ${{ inputs.prerelease }}
+          append_body: true
+          body: |
+            npm package: `@neuralbase/js`
+            Install: `npm install @neuralbase/js`
+
+  release_python:
+    needs: [validate, tag, publish_python]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Create Python GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ needs.tag.outputs.python_tag }}
+          name: Python SDK v${{ needs.validate.outputs.version }}
+          generate_release_notes: true
+          prerelease: ${{ inputs.prerelease }}
+          append_body: true
+          body: |
+            PyPI package: `neuralbase`
+            Install: `pip install neuralbase`

@@ -1,0 +1,43 @@
+{
+  "name": "@neuralbase/js",
+  "version": "0.1.0",
+  "description": "Official JavaScript client for the NeuralBase memory and ingest API.",
+  "type": "module",
+  "main": "./dist/neuralbase.js",
+  "types": "./dist/neuralbase.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/neuralbase.d.ts",
+      "import": "./dist/neuralbase.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "sideEffects": false,
+  "engines": {
+    "node": ">=18"
+  },
+  "license": "MIT",
+  "homepage": "https://neuralbase.cloud",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/1dev-org/neuralbase-sdks.git"
+  },
+  "bugs": {
+    "url": "https://github.com/1dev-org/neuralbase-sdks/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "clean": "node -e \"import('node:fs').then(fs => fs.rmSync('dist', { recursive: true, force: true }))\"",
+    "prepublishOnly": "npm run clean && npm run build"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.2"
+  }
+}
