@@ -2,13 +2,13 @@
 
 This repo is now prepared for:
 
-- npm package: `@neuralbase/js`
+- npm package: `@neuralbase-org/js`
 - PyPI package: `neuralbase`
 - Release workflow: `.github/workflows/release-sdks.yml`
 
 ## Before first publish
 
-1. Make sure you control the npm scope `@neuralbase`.
+1. Make sure you control the npm scope `@neuralbase-org`.
 2. Make sure you own the PyPI project name `neuralbase`.
 3. SDK package metadata is set to `MIT` and each SDK directory includes its own `LICENSE` file.
 4. Bump versions in:
@@ -79,7 +79,7 @@ What it does:
 
 ## Recommended release order
 
-1. Configure npm trusted publishing for `@neuralbase/js`
+1. Configure npm trusted publishing for `@neuralbase-org/js`
 2. Configure PyPI trusted publishing for `neuralbase`
 3. Bump both SDK versions in code
 4. Run the combined release workflow

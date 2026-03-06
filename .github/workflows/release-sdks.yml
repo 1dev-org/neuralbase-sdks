@@ -189,8 +189,8 @@ PY
           prerelease: ${{ inputs.prerelease }}
           append_body: true
           body: |
-            npm package: `@neuralbase/js`
-            Install: `npm install @neuralbase/js`
+            npm package: `@neuralbase-org/js`
+            Install: `npm install @neuralbase-org/js`
 
   release_python:
     needs: [validate, tag, publish_python]

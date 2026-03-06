@@ -8,7 +8,7 @@ memory, connector ingest, batch ingest, and status APIs exposed by
 
 ## Packages
 
-- JavaScript: `@neuralbase/js`
+- JavaScript: `@neuralbase-org/js`
 - Python: `neuralbase`
 
 ## What the SDKs cover
@@ -29,7 +29,7 @@ duplicating queued memory jobs.
 JavaScript:
 
 ```ts
-import { NeuralBaseClient } from "@neuralbase/js";
+import { NeuralBaseClient } from "@neuralbase-org/js";
 
 const nb = new NeuralBaseClient({ apiKey: "nb_live_..." });
 
@@ -62,7 +62,7 @@ print(result["memoryId"])
 
 ## Package layout
 
-- `sdks/javascript` - npm package source for `@neuralbase/js`
+- `sdks/javascript` - npm package source for `@neuralbase-org/js`
 - `sdks/python` - PyPI package source for `neuralbase`
 - `.github/workflows` - release and publish automation
 

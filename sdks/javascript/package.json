@@ -1,5 +1,5 @@
 {
-  "name": "@neuralbase/js",
+  "name": "@neuralbase-org/js",
   "version": "0.1.0",
   "description": "Official JavaScript client for the NeuralBase memory and ingest API.",
   "type": "module",
@@ -24,7 +24,7 @@
   "homepage": "https://neuralbase.cloud",
   "repository": {
     "type": "git",
-    "url": "https://github.com/1dev-org/neuralbase-sdks.git"
+    "url": "git+https://github.com/1dev-org/neuralbase-sdks.git"
   },
   "bugs": {
     "url": "https://github.com/1dev-org/neuralbase-sdks/issues"

@@ -1,17 +1,17 @@
-# `@neuralbase/js`
+# `@neuralbase-org/js`
 
 Official JavaScript client for the NeuralBase API.
 
 ## Install
 
 ```bash
-npm install @neuralbase/js
+npm install @neuralbase-org/js
 ```
 
 ## Use
 
 ```ts
-import { NeuralBaseClient } from "@neuralbase/js";
+import { NeuralBaseClient } from "@neuralbase-org/js";
 
 const nb = new NeuralBaseClient({
   apiKey: "nb_live_...",
